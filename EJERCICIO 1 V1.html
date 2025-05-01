@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Startup Spark</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Animate.css CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+  <!-- Google Fonts - Raleway -->
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- jsPDF CDN para exportar PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="backdrop-blur-md bg-white/10 rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center animate__animated animate__fadeInDown">
+    <h1 class="text-4xl font-bold text-white mb-4 animate__animated animate__fadeIn">Startup Spark</h1>
+    <p class="text-white mb-6 animate__animated animate__fadeIn">Escribe de 1 a 3 palabras clave y genera una idea creativa de negocio.</p>
+    
+    <input type="text" id="keywords" placeholder="Ej: salud, app, legal"
+      class="w-full p-3 rounded-md text-black focus:outline-none mb-4"
+    />
+    
+    <button onclick="generarIdea()"
+      class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-bold transition duration-300 animate__animated animate__fadeInUp">
+      🚀 Generar Idea
+    </button>
+    
+    <div id="mensaje" class="mt-4 text-yellow-300 font-semibold hidden animate__animated"></div>
+    <div id="resultado" class="mt-6 text-white text-xl font-semibold animate__animated"></div>
+    
+    <!-- Funcionalidades adicionales -->
+    <div id="acciones" class="mt-6 hidden">
+      <button onclick="guardarIdea()"
+        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full mx-2">
+        ⭐ Guardar Idea
+      </button>
+      <button onclick="exportarPDF()"
+        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full mx-2">
+        📄 Exportar PDF
+      </button>
+      <button onclick="compartirWhatsApp()"
+        class="bg-lime-500 hover:bg-lime-600 text-white px-4 py-2 rounded-full mx-2">
+        📱 Compartir WhatsApp
+      </button>
+    </div>
+
+    <div class="mt-8 text-left">
+      <h2 class="text-white text-lg font-semibold mb-2">⭐ Tus ideas guardadas:</h2>
+      <ul id="ideasGuardadas" class="text-white list-disc pl-5 text-sm"></ul>
+    </div>
+  </div>
+
+  <script>
+    const ideas = [
+      "Plataforma legal para resolver conflictos inmobiliarios mediante IA.",
+      "App móvil para asesoría legal exprés para emprendedores.",
+      "Red de psicólogos freelance con atención virtual 24/7.",
+      "Suscripción mensual a desayunos sorpresa personalizados.",
+      "Marketplace de propiedades para mexicanos en el extranjero.",
+      "Asistente virtual para resolver dudas jurídicas básicas.",
+      "Servicio de helados artesanales con entregas por dron.",
+      "Tienda digital de regalos con identidad espiritual y numerológica.",
+      "Consultoría financiera y legal para nuevos negocios familiares.",
+      "Club online para conectar mujeres emprendedoras latinas."
+    ];
+
+    let ideaActual = "";
+    const guardadas = [];
+
+    function generarIdea() {
+      const input = document.getElementById("keywords");
+      const mensaje = document.getElementById("mensaje");
+      const resultado = document.getElementById("resultado");
+      const acciones = document.getElementById("acciones");
+
+      const texto = input.value.trim();
+      mensaje.classList.add("hidden");
+      resultado.classList.remove("animate__fadeInUp");
+
+      if (texto === "") {
+        mensaje.textContent = "⚠️ Por favor, escribe al menos una palabra clave.";
+        mensaje.classList.remove("hidden");
+        mensaje.classList.add("animate__shakeX");
+        setTimeout(() => mensaje.classList.remove("animate__shakeX"), 1000);
+        return;
+      }
+
+      ideaActual = ideas[Math.floor(Math.random() * ideas.length)];
+      resultado.textContent = ideaActual;
+      resultado.classList.add("animate__fadeInUp");
+      acciones.classList.remove("hidden");
+    }
+
+    function guardarIdea() {
+      if (ideaActual && !guardadas.includes(ideaActual)) {
+        guardadas.push(ideaActual);
+        actualizarLista();
+      }
+    }
+
+    function actualizarLista() {
+      const lista = document.getElementById("ideasGuardadas");
+      lista.innerHTML = "";
+      guardadas.forEach((idea, index) => {
+        const li = document.createElement("li");
+        li.textContent = idea;
+        lista.appendChild(li);
+      });
+    }
+
+    function exportarPDF() {
+      if (!guardadas.length) return alert("No hay ideas guardadas para exportar.");
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("Ideas guardadas – Startup Spark", 20, 20);
+      doc.setFont("helvetica", "normal");
+      guardadas.forEach((idea, i) => {
+        doc.text(`• ${idea}`, 20, 30 + i * 10);
+      });
+      doc.save("StartupSpark_Ideas.pdf");
+    }
+
+    function compartirWhatsApp() {
+      if (!ideaActual) return alert("Genera una idea primero.");
+      const url = `https://wa.me/?text=${encodeURIComponent("🚀 Mira esta idea de negocio:\n\n" + ideaActual)}`;
+      window.open(url, "_blank");
+    }
+  </script>
+</body>
+</html>
+
